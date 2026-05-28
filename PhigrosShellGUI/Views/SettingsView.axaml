@@ -1,0 +1,135 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             x:Class="PhigrosShellGUI.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <Border Background="{DynamicResource SystemChromeLowColor}"
+            CornerRadius="12"
+            Padding="20"
+            MaxWidth="480"
+            MinWidth="360">
+        <StackPanel Spacing="14">
+
+            <!-- 标题 -->
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <ic:FluentIcon Icon="SettingsCogMultiple" />
+                <TextBlock Text="设置"
+                           FontSize="18"
+                           FontWeight="SemiBold" />
+            </StackPanel>
+            <Separator />
+
+            <!-- ════ 主题选择 ════ -->
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <ic:FluentIcon Icon="ColorFill" Foreground="{DynamicResource SystemAccentColor}" />
+                <TextBlock Text="主题"
+                           FontSize="13"
+                           Foreground="{DynamicResource SystemAccentColor}" />
+            </StackPanel>
+
+            <StackPanel Spacing="6" Margin="0,0,0,4">
+                <RadioButton GroupName="ThemeGroup"
+                             IsChecked="{Binding SelectedTheme, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Default}"
+                             VerticalContentAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <ic:FluentIcon Icon="DarkTheme" VerticalAlignment="Center" />
+                        <TextBlock Text="跟随系统" VerticalAlignment="Center" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton GroupName="ThemeGroup"
+                             IsChecked="{Binding SelectedTheme, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Light}"
+                             VerticalContentAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <ic:FluentIcon Icon="WeatherSunny" VerticalAlignment="Center" />
+                        <TextBlock Text="浅色" VerticalAlignment="Center" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton GroupName="ThemeGroup"
+                             IsChecked="{Binding SelectedTheme, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Dark}"
+                             VerticalContentAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <ic:FluentIcon Icon="WeatherMoon" VerticalAlignment="Center" />
+                        <TextBlock Text="深色" VerticalAlignment="Center" />
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+
+            <Separator />
+
+            <!-- ════ Difficulty.TSV 导入 ════ -->
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <ic:FluentIcon Icon="DataBarVertical" Foreground="{DynamicResource SystemAccentColor}" />
+                <TextBlock Text="歌曲定数文件"
+                           FontSize="13"
+                           Foreground="{DynamicResource SystemAccentColor}" />
+            </StackPanel>
+
+            <TextBlock Text="导入官方 Difficulty.TSV 文件以显示歌曲定数和 RKS 评分："
+                       FontSize="12"
+                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                       TextWrapping="Wrap" />
+
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                <!-- 状态文字 -->
+                <TextBlock Grid.Column="0"
+                           Text="{Binding DifficultyTsvStatus}"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap" />
+
+                <!-- 导入按钮 -->
+                <Button Grid.Column="1"
+                        Padding="12,6"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding ImportDifficultyTsvCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <ic:FluentIcon Icon="FolderOpen" VerticalAlignment="Center" />
+                        <TextBlock Text="导入" FontSize="13" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <!-- 清除按钮（有TSV时才显示） -->
+                <Button Grid.Column="2"
+                        Padding="12,6"
+                        Background="Transparent"
+                        VerticalContentAlignment="Center"
+                        IsVisible="{Binding HasDifficultyTsv}"
+                        Command="{Binding ClearDifficultyTsvCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <ic:FluentIcon Icon="DismissCircle" VerticalAlignment="Center" />
+                        <TextBlock Text="清除" FontSize="13" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <Separator />
+
+            <!-- ════ 提示 ════ -->
+            <TextBlock Text="提示：主题变更立即生效；定数文件导入后重启应用即可生效。"
+                       FontSize="11"
+                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                       FontStyle="Italic" />
+
+            <!-- 按钮 -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8">
+                <Button Content="取消"
+                        MinWidth="80"
+                        Padding="12,6"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding CancelCommand}" />
+                <Button Content="保存"
+                        MinWidth="80"
+                        Padding="12,6"
+                        Background="{DynamicResource SystemAccentColor}"
+                        Foreground="White"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding ConfirmCommand}" />
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+</UserControl>

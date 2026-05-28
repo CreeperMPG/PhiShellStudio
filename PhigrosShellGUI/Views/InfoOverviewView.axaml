@@ -1,0 +1,269 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             xmlns:controls="using:PhigrosShellGUI.Controls"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             x:Class="PhigrosShellGUI.Views.InfoOverviewView"
+             x:DataType="vm:InfoOverviewViewModel">
+
+    <Design.DataContext>
+        <vm:InfoOverviewViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <!-- ════ Layer 0：主内容 ════ -->
+        <ScrollViewer>
+            <controls:UniformWrapPanel Margin="8"
+                                       MinItemWidth="350"
+                                       HorizontalSpacing="8"
+                                       VerticalSpacing="8">
+
+                <!-- ═══════════════════════════ -->
+                <!-- 👤 用户信息 卡片              -->
+                <!-- ═══════════════════════════ -->
+                <Border Background="{DynamicResource SystemChromeLowColor}"
+                        CornerRadius="8" Padding="16"
+                        BoxShadow="0 2 8 0 #30000000">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <ic:FluentIcon Icon="Person6" />
+                            <TextBlock Text="用户信息" FontSize="16" FontWeight="SemiBold" />
+                        </StackPanel>
+                        <Separator />
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Text="显示 PlayerID：" Grid.Row="0" />
+                            <TextBlock Text="{Binding ShowPlayerId}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="0" />
+
+                            <TextBlock Text="自我介绍：" Grid.Row="1" />
+                            <controls:InlineEditableTextBlock Text="{Binding SelfIntro}"
+                                                             IsValid="{Binding IsSelfIntroValid}"
+                                                             ConfirmCommand="{Binding ConfirmSelfIntroCommand}"
+                                                             AcceptsReturn="True"
+                                                             PlaceholderText="输入自我介绍..."
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="1" />
+
+                            <TextBlock Text="头像ID：" Grid.Row="2" />
+                            <controls:InlineEditableTextBlock Text="{Binding Avatar}"
+                                                             IsValid="{Binding IsAvatarValid}"
+                                                             ConfirmCommand="{Binding ConfirmAvatarCommand}"
+                                                             PlaceholderText="输入头像ID..."
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="2" />
+
+                            <TextBlock Text="背景ID：" Grid.Row="3" />
+                            <controls:InlineEditableTextBlock Text="{Binding Background}"
+                                                             IsValid="{Binding IsBackgroundValid}"
+                                                             ConfirmCommand="{Binding ConfirmBackgroundCommand}"
+                                                             PlaceholderText="输入背景ID..."
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="3" />
+
+                            <TextBlock Text="额外数据：" Grid.Row="4" />
+                            <TextBlock Text="{Binding UserOverflow, StringFormat={}{0} bytes}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="4" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══════════════════════════ -->
+                <!-- 📈 游戏进度 卡片              -->
+                <!-- ═══════════════════════════ -->
+                <Border Background="{DynamicResource SystemChromeLowColor}"
+                        CornerRadius="8" Padding="16"
+                        BoxShadow="0 2 8 0 #30000000">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <ic:FluentIcon Icon="DataTrending" />
+                            <TextBlock Text="游戏进度" FontSize="16" FontWeight="SemiBold" />
+                        </StackPanel>
+                        <Separator />
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Text="是否运行过：" Grid.Row="0" />
+                            <TextBlock Text="{Binding IsFirstRun}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="0" />
+
+                            <TextBlock Text="过去的章节是否完成：" Grid.Row="1" />
+                            <TextBlock Text="{Binding LegacyChapterFinished}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="1" />
+
+                            <TextBlock Text="通关版本：" Grid.Row="2" />
+                            <controls:InlineEditableTextBlock Text="{Binding Completed}"
+                                                             IsValid="{Binding IsCompletedValid}"
+                                                             ConfirmCommand="{Binding ConfirmCompletedCommand}"
+                                                             AcceptsReturn="True"
+                                                             PlaceholderText="通关版本..."
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="2" />
+
+                            <TextBlock Text="课题模式：" Grid.Row="3" />
+                            <controls:InlineEditableTextBlock Text="{Binding ChallengeModeRank}"
+                                                             IsValid="{Binding IsChallengeModeRankValid}"
+                                                             ConfirmCommand="{Binding ConfirmChallengeModeRankCommand}"
+                                                             PlaceholderText="0 - 32767"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="3" />
+
+                            <TextBlock Text="Data：" Grid.Row="4" />
+                            <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1" Margin="16,0,0,0" Grid.Row="4">
+                                <TextBlock VerticalAlignment="Center">
+                                    <Run Text="{Binding MoneyPB}" />
+                                    <Run Text="PB" FontSize="11" Foreground="{DynamicResource SystemAccentColor}" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding MoneyTB}" />
+                                    <Run Text="TB" FontSize="11" Foreground="{DynamicResource SystemAccentColor}" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding MoneyGB}" />
+                                    <Run Text="GB" FontSize="11" Foreground="{DynamicResource SystemAccentColor}" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding MoneyMB}" />
+                                    <Run Text="MB" FontSize="11" Foreground="{DynamicResource SystemAccentColor}" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding MoneyKB}" />
+                                    <Run Text="KB" FontSize="11" Foreground="{DynamicResource SystemAccentColor}" />
+                                </TextBlock>
+                                <Button Width="22" Height="22"
+                                        Padding="0"
+                                        Background="Transparent"
+                                        VerticalContentAlignment="Center"
+                                        ToolTip.Tip="编辑 Data"
+                                        Command="{Binding EditDataCommand}">
+                                    <PathIcon Data="{StaticResource EditIconGeometry}" Width="11" Height="11" VerticalAlignment="Center" />
+                                </Button>
+                            </StackPanel>
+
+                            <TextBlock Text="Spasmodic 解锁：" Grid.Row="5" />
+                            <controls:InlineEditableTextBlock Text="{Binding UnlockSpasmodic}"
+                                                             IsValid="{Binding IsUnlockSpasmodicValid}"
+                                                             ConfirmCommand="{Binding ConfirmUnlockSpasmodicCommand}"
+                                                             PlaceholderText="0-255"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="5" />
+
+                            <TextBlock Text="Igallta 解锁：" Grid.Row="6" />
+                            <controls:InlineEditableTextBlock Text="{Binding UnlockIgallta}"
+                                                             IsValid="{Binding IsUnlockIgalltaValid}"
+                                                             ConfirmCommand="{Binding ConfirmUnlockIgalltaCommand}"
+                                                             PlaceholderText="0-255"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="6" />
+
+                            <TextBlock Text="Rrhar'il 解锁：" Grid.Row="7" />
+                            <controls:InlineEditableTextBlock Text="{Binding UnlockRrharil}"
+                                                             IsValid="{Binding IsUnlockRrharilValid}"
+                                                             ConfirmCommand="{Binding ConfirmUnlockRrharilCommand}"
+                                                             PlaceholderText="0-255"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="7" />
+
+                            <TextBlock Text="Random 解锁：" Grid.Row="8" />
+                            <controls:InlineEditableTextBlock Text="{Binding RandomVersionUnlocked}"
+                                                             IsValid="{Binding IsRandomVersionUnlockedValid}"
+                                                             ConfirmCommand="{Binding ConfirmRandomVersionUnlockedCommand}"
+                                                             PlaceholderText="0-255"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="8" />
+
+                            <TextBlock Text="第八章进度：" Grid.Row="9" />
+                            <controls:InlineEditableTextBlock Text="{Binding Chapter8SongUnlocked}"
+                                                             IsValid="{Binding IsChapter8SongUnlockedValid}"
+                                                             ConfirmCommand="{Binding ConfirmChapter8SongUnlockedCommand}"
+                                                             PlaceholderText="0-255"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="9" />
+
+                            <TextBlock Text="额外数据：" Grid.Row="10" />
+                            <TextBlock Text="{Binding ProgressOverflow, StringFormat={}{0} bytes}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="10" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══════════════════════════ -->
+                <!-- ⚙️ 游戏设置 卡片              -->
+                <!-- ═══════════════════════════ -->
+                <Border Background="{DynamicResource SystemChromeLowColor}"
+                        CornerRadius="8" Padding="16"
+                        BoxShadow="0 2 8 0 #30000000">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <ic:FluentIcon Icon="SettingsCogMultiple" />
+                            <TextBlock Text="游戏设置" FontSize="16" FontWeight="SemiBold" />
+                        </StackPanel>
+                        <Separator />
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Text="Chord 支持：" Grid.Row="0" />
+                            <TextBlock Text="{Binding ChordSupport}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="0" />
+
+                            <TextBlock Text="FC/AP 指示器：" Grid.Row="1" />
+                            <TextBlock Text="{Binding FcAPIndicator}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="1" />
+
+                            <TextBlock Text="打击音效：" Grid.Row="2" />
+                            <TextBlock Text="{Binding EnableHitSound}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="2" />
+
+                            <TextBlock Text="低分辨率：" Grid.Row="3" />
+                            <TextBlock Text="{Binding LowResolutionMode}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="3" />
+
+                            <TextBlock Text="设备名：" Grid.Row="4" />
+                            <controls:InlineEditableTextBlock Text="{Binding DeviceName}"
+                                                             IsValid="{Binding IsDeviceNameValid}"
+                                                             ConfirmCommand="{Binding ConfirmDeviceNameCommand}"
+                                                             PlaceholderText="设备名称..."
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="4" />
+
+                            <TextBlock Text="曲绘亮度：" Grid.Row="5" />
+                            <controls:InlineEditableTextBlock Text="{Binding Bright}"
+                                                             IsValid="{Binding IsBrightValid}"
+                                                             ConfirmCommand="{Binding ConfirmBrightCommand}"
+                                                             PlaceholderText="0.0 - 5.0"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="5" />
+
+                            <TextBlock Text="音乐音量：" Grid.Row="6" />
+                            <controls:InlineEditableTextBlock Text="{Binding MusicVolume}"
+                                                             IsValid="{Binding IsMusicVolumeValid}"
+                                                             ConfirmCommand="{Binding ConfirmMusicVolumeCommand}"
+                                                             PlaceholderText="0.0 - 10.0"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="6" />
+
+                            <TextBlock Text="音效音量：" Grid.Row="7" />
+                            <controls:InlineEditableTextBlock Text="{Binding EffectVolume}"
+                                                             IsValid="{Binding IsEffectVolumeValid}"
+                                                             ConfirmCommand="{Binding ConfirmEffectVolumeCommand}"
+                                                             PlaceholderText="0.0 - 10.0"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="7" />
+
+                            <TextBlock Text="打击音量：" Grid.Row="8" />
+                            <controls:InlineEditableTextBlock Text="{Binding HitSoundVolume}"
+                                                             IsValid="{Binding IsHitSoundVolumeValid}"
+                                                             ConfirmCommand="{Binding ConfirmHitSoundVolumeCommand}"
+                                                             PlaceholderText="0.0 - 10.0"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="8" />
+
+                            <TextBlock Text="谱面延迟：" Grid.Row="9" />
+                            <controls:InlineEditableTextBlock Text="{Binding SoundOffset}"
+                                                             IsValid="{Binding IsSoundOffsetValid}"
+                                                             ConfirmCommand="{Binding ConfirmSoundOffsetCommand}"
+                                                             PlaceholderText="-1000 - 1000"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="9" />
+
+                            <TextBlock Text="Note 大小：" Grid.Row="10" />
+                            <controls:InlineEditableTextBlock Text="{Binding NoteScale}"
+                                                             IsValid="{Binding IsNoteScaleValid}"
+                                                             ConfirmCommand="{Binding ConfirmNoteScaleCommand}"
+                                                             PlaceholderText="0.1 - 5.0"
+                                                             Margin="12,0,0,0"
+                                                             Grid.Column="1" Grid.Row="10" />
+
+                            <TextBlock Text="额外数据：" Grid.Row="11" />
+                            <TextBlock Text="{Binding SettingsOverflow, StringFormat={}{0} bytes}" Margin="16,0,0,0" Grid.Column="1" Grid.Row="11" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </controls:UniformWrapPanel>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>

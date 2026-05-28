@@ -1,0 +1,116 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PhigrosShellGUI.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ic="using:FluentIcons.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="300"
+        x:Class="PhigrosShellGUI.Views.DataEditDialog"
+        x:DataType="vm:DataEditViewModel"
+        Title="Data 设置"
+        Width="420"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        TransparencyLevelHint="Blur">
+
+    <Border Padding="20" CornerRadius="8">
+        <StackPanel Spacing="16">
+
+            <!-- 标题 -->
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <ic:FluentIcon Icon="MoneyCalculator" />
+                <TextBlock Text="Data 设置" FontSize="18" FontWeight="SemiBold" />
+            </StackPanel>
+
+            <Separator />
+
+            <!-- ════ 分量输入 ════ -->
+            <TextBlock Text="按单位输入：" FontSize="13" Foreground="{DynamicResource SystemAccentColor}" />
+            <Grid ColumnDefinitions="*,*,*,*,*"
+                  RowDefinitions="Auto,Auto"
+                  ColumnSpacing="8"
+                  RowSpacing="4">
+                <!-- 标签行 -->
+                <TextBlock Text="PB" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" FontSize="12" />
+                <TextBlock Text="TB" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" FontSize="12" />
+                <TextBlock Text="GB" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" FontSize="12" />
+                <TextBlock Text="MB" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Center" FontSize="12" />
+                <TextBlock Text="KB" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Center" FontSize="12" />
+
+                <!-- 输入框行 -->
+                <TextBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch"
+                         Text="{Binding ValuePB}"
+                         x:Name="PbBox"
+                         TextAlignment="Center"
+                         MaxLines="1" />
+                <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch"
+                         Text="{Binding ValueTB}"
+                         x:Name="TbBox"
+                         TextAlignment="Center"
+                         MaxLines="1" />
+                <TextBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch"
+                         Text="{Binding ValueGB}"
+                         x:Name="GbBox"
+                         TextAlignment="Center"
+                         MaxLines="1" />
+                <TextBox Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch"
+                         Text="{Binding ValueMB}"
+                         x:Name="MbBox"
+                         TextAlignment="Center"
+                         MaxLines="1" />
+                <TextBox Grid.Row="1" Grid.Column="4" HorizontalAlignment="Stretch"
+                         Text="{Binding ValueKB}"
+                         x:Name="KbBox"
+                         TextAlignment="Center"
+                         MaxLines="1" />
+            </Grid>
+
+            <TextBlock Text="提示：输入超过 1023 会自动进位到上一级"
+                       FontSize="11"
+                       Foreground="{DynamicResource SystemAccentColor}"
+                       FontStyle="Italic"
+                       HorizontalAlignment="Center" />
+
+            <Separator />
+
+            <!-- ════ 总 KB 输入 ════ -->
+            <TextBlock Text="或者，直接输入 KB 总数：" FontSize="13" Foreground="{DynamicResource SystemAccentColor}" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <TextBox Grid.Column="0"
+                         Text="{Binding TotalKB}"
+                         x:Name="TotalKbBox"
+                         TextAlignment="Right"
+                         MaxLines="1" />
+                <TextBlock Grid.Column="1"
+                           Text="KB"
+                           VerticalAlignment="Center"
+                           FontSize="14"
+                           FontWeight="Medium" />
+            </Grid>
+
+            <!-- 错误信息 -->
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Foreground="#E04040"
+                       FontSize="12"
+                       FontWeight="Medium" />
+
+            <!-- ════ 按钮 ════ -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8">
+                <Button Content="取消"
+                        x:Name="CancelButton"
+                        MinWidth="80"
+                        Padding="12,6" />
+                <Button Content="确定"
+                        x:Name="ConfirmButton"
+                        MinWidth="80"
+                        Padding="12,6"
+                        Background="{DynamicResource SystemAccentColor}"
+                        Foreground="White" />
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+</Window>

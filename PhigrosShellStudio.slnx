@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="PhigrosShellGUI.Android/PhigrosShellGUI.Android.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+  <Project Path="PhigrosShellGUI.Desktop/PhigrosShellGUI.Desktop.csproj" />
+  <Project Path="PhigrosShellGUI/PhigrosShellGUI.csproj" />
+</Solution>

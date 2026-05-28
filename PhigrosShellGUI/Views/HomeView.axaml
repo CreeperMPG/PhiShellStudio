@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             x:Class="PhigrosShellGUI.Views.HomeView"
+             x:DataType="vm:HomeViewModel">
+
+    <Design.DataContext>
+        <vm:HomeViewModel/>
+    </Design.DataContext>
+
+    <Grid HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          MaxWidth="360">
+        <StackPanel Spacing="20" HorizontalAlignment="Center">
+            <!-- 标题 -->
+            <TextBlock Text="选择一个以开始..."
+                       FontSize="22"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Center" />
+
+            <!-- 从文件打开 -->
+            <Button Command="{Binding OpenFromFileCommand}"
+                    MinWidth="260"
+                    Height="56"
+                    Padding="16,0"
+                    HorizontalContentAlignment="Stretch"
+                    Background="{DynamicResource SystemChromeLowColor}"
+                    BorderThickness="1">
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                    <ic:FluentIcon Icon="DocumentFolder" IconSize="Size20" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="从文件打开" FontSize="15" FontWeight="Medium" />
+                        <TextBlock Text="导入本地的 .save 存档文件"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource SystemBaseMediumColor}" />
+                    </StackPanel>
+                </StackPanel>
+            </Button>
+
+            <!-- 从云存档打开 -->
+            <Button Command="{Binding OpenFromCloudCommand}"
+                    MinWidth="260"
+                    Height="56"
+                    Padding="16,0"
+                    HorizontalContentAlignment="Stretch"
+                    Background="{DynamicResource SystemChromeLowColor}"
+                    BorderThickness="1">
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                    <ic:FluentIcon Icon="CloudArchive" IconSize="Size20" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="从云存档打开" FontSize="15" FontWeight="Medium" />
+                        <TextBlock Text="从 Phigros 服务器下载存档"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource SystemBaseMediumColor}" />
+                    </StackPanel>
+                </StackPanel>
+            </Button>
+
+            <!-- 加载状态 -->
+            <StackPanel IsVisible="{Binding IsLoading}" Spacing="8" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Height="4" Width="200" />
+                <TextBlock Text="{Binding StatusMessage}"
+                           FontSize="12"
+                           Foreground="{DynamicResource SystemAccentColor}"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
