@@ -1,0 +1,226 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             xmlns:ab="using:PhigrosArchive.Abstractions"
+             x:Class="PhigrosShellGUI.Views.SlotDetailView"
+             x:DataType="vm:SlotDetailViewModel">
+
+    <Design.DataContext>
+        <vm:SlotDetailViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <!-- ════ Layer 0：页面内容 ════ -->
+        <DockPanel>
+            <!-- 顶栏：返回 + 标题 + 操作按钮 -->
+            <Border DockPanel.Dock="Top"
+                    Background="{DynamicResource SystemChromeLowColor}"
+                    Padding="16,12">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <!-- 左侧：返回按钮 -->
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <Button Command="{Binding GoBackCommand}"
+                                Content="← 返回"
+                                FontSize="14" />
+                        <TextBlock Text="{Binding Title}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- 右侧：操作按钮 -->
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="4"
+                                VerticalAlignment="Center">
+                        <!-- 存档检查按钮 -->
+                        <Button Command="{Binding OpenIssuesCommand}"
+                                ToolTip.Tip="检查存档完整性"
+                                MinWidth="90"
+                                Padding="8,4"
+                                HorizontalContentAlignment="Center"
+                                IsEnabled="{Binding IsCheckingIssues, Converter={StaticResource InverseBoolConverter}}">
+                            <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                                <ic:FluentIcon Icon="Warning" IconSize="Size16" />
+                                <TextBlock Text="{Binding IssueSummary}" FontSize="12" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- 导出按钮 -->
+                        <Button Command="{Binding ExportSaveCommand}"
+                                ToolTip.Tip="导出存档到本地"
+                                MinWidth="80"
+                                Padding="8,4"
+                                HorizontalContentAlignment="Center"
+                                IsEnabled="{Binding IsExporting, Converter={StaticResource InverseBoolConverter}}">
+                            <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                                <ic:FluentIcon Icon="Save" IconSize="Size16" />
+                                <TextBlock Text="{Binding ExportStatus}" FontSize="12" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- 上传按钮 -->
+                        <Button Command="{Binding ShowUploadConfirmCommand}"
+                                ToolTip.Tip="上传存档到云端"
+                                MinWidth="80"
+                                Padding="8,4"
+                                HorizontalContentAlignment="Center"
+                                IsEnabled="{Binding CanUploadNow}">
+                            <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                                <ic:FluentIcon Icon="CloudArrowUp" IconSize="Size16" />
+                                <TextBlock Text="{Binding UploadStatus}" FontSize="12" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- 刷新按钮 -->
+                        <Button Command="{Binding RefreshCommand}"
+                                ToolTip.Tip="重新加载存档（应用新的定数表等）"
+                                MinWidth="32" MinHeight="32"
+                                Padding="6"
+                                HorizontalContentAlignment="Center"
+                                IsEnabled="{Binding IsRefreshing, Converter={StaticResource InverseBoolConverter}}">
+                            <ic:FluentIcon Icon="ArrowSync" IconSize="Size16" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 选项卡内容 -->
+            <TabControl ItemsSource="{Binding Tabs}"
+                        SelectedIndex="0"
+                        Margin="16">
+                <TabControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DetailTabItem">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <ic:FluentIcon Icon="{Binding Icon}" IconSize="Size16" />
+                            <TextBlock Text="{Binding Header}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate x:DataType="vm:DetailTabItem">
+                        <ContentControl Content="{Binding Content}"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch" />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </DockPanel>
+
+        <!-- ════ Layer 1：存档问题 Overlay ════ -->
+        <Border IsVisible="{Binding IsIssueOverlayVisible}"
+                Background="#80000000" ZIndex="200">
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="12" Padding="20"
+                    MaxWidth="540" MaxHeight="400"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 20 0 #50000000">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <ic:FluentIcon Icon="WarningShield" />
+                        <TextBlock Text="{Binding IssueCount, StringFormat='存档问题 ({0} 项)'}"
+                                   FontSize="17" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <Separator />
+                    <ScrollViewer MaxHeight="280">
+                        <ItemsControl ItemsSource="{Binding Issues}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="ab:SaveDataIssue">
+                                    <Border Padding="8,4" Margin="0,2"
+                                            Background="{DynamicResource SystemChromeMediumLowColor}"
+                                            CornerRadius="4">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                            <TextBlock Text="{Binding Severity}"
+                                                       FontSize="11" FontWeight="Bold"
+                                                       Foreground="{DynamicResource SystemAccentColor}"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Message}"
+                                                       FontSize="12"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding Path}"
+                                                       FontSize="10"
+                                                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                                                       VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <Separator />
+                    <Button Content="关闭"
+                            HorizontalAlignment="Right"
+                            MinWidth="80" Padding="12,6"
+                            Command="{Binding CloseIssuesCommand}" />
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- ════ Layer 2：错误提示 Overlay ════ -->
+        <Border IsVisible="{Binding IsErrorOverlayVisible}"
+                Background="#80000000" ZIndex="210">
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="12" Padding="24"
+                    MaxWidth="460"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 20 0 #50000000">
+                <StackPanel Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <ic:FluentIcon Icon="ErrorCircle" IconSize="Size20"
+                                       Foreground="{DynamicResource SystemAccentColor}" />
+                        <TextBlock Text="{Binding ErrorTitle}"
+                                   FontSize="18" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <Separator />
+                    <ScrollViewer MaxHeight="300">
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   FontSize="13"
+                                   TextWrapping="Wrap" />
+                    </ScrollViewer>
+                    <Separator />
+                    <Button Content="关闭"
+                            HorizontalAlignment="Right"
+                            MinWidth="80" Padding="12,6"
+                            Command="{Binding CloseErrorCommand}" />
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- ════ Layer 3：确认 Overlay ════ -->
+        <Border IsVisible="{Binding IsConfirmVisible}"
+                Background="#80000000" ZIndex="220">
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="12" Padding="24"
+                    MaxWidth="380"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 20 0 #50000000">
+                <StackPanel Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <ic:FluentIcon Icon="QuestionCircle" IconSize="Size20" />
+                        <TextBlock Text="{Binding ConfirmTitle}"
+                                   FontSize="18" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <Separator />
+                    <TextBlock Text="{Binding ConfirmMessage}"
+                               FontSize="13"
+                               TextWrapping="Wrap" />
+                    <Separator />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <Button Content="取消" MinWidth="80" Padding="12,6"
+                                Command="{Binding CancelConfirmCommand}" />
+                        <Button Content="确认" MinWidth="80" Padding="12,6"
+                                Background="{DynamicResource SystemAccentColor}" Foreground="White"
+                                Command="{Binding ConfirmActionCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             x:Class="PhigrosShellGUI.Views.MainView"
+             x:DataType="vm:MainViewModel">
+
+    <Design.DataContext>
+        <vm:MainViewModel/>
+    </Design.DataContext>
+
+    <DockPanel>
+        <!-- 顶栏：用户信息 -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemChromeLowColor}"
+                Padding="16,12">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock Text="{Binding Nickname}"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="{Binding ShortId, StringFormat='#{0}'}"
+                           FontSize="14"
+                           Foreground="{DynamicResource SystemBaseMediumColor}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- Slot 存档列表 -->
+        <ScrollViewer Margin="16,8">
+            <StackPanel Spacing="8">
+                <TextBlock Text="选择要查看的存档："
+                           FontSize="16"
+                           Margin="0,0,0,8" />
+
+                <ItemsControl ItemsSource="{Binding Slots}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SaveSlotBrief">
+                            <Border Padding="12"
+                                    Margin="0,4"
+                                    CornerRadius="8"
+                                    Background="{DynamicResource SystemChromeLowColor}"
+                                    PointerPressed="OnSlotPointerPressed"
+                                    Tag="{Binding .}">
+                                <Grid ColumnDefinitions="Auto,*,Auto"
+                                      RowDefinitions="Auto,Auto">
+                                    <TextBlock Text="{Binding SlotIndex, StringFormat='Slot #{0}'}"
+                                               FontSize="16"
+                                               FontWeight="Bold" />
+                                    <TextBlock Text="{Binding RKS, StringFormat={}RKS: {0:F4}}"
+                                               Grid.Row="1"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource SystemAccentColor}" />
+                                    <TextBlock Text="{Binding Challenge, StringFormat='Challenge: {0}'}"
+                                               Grid.Column="1"
+                                               Grid.Row="1"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource SystemBaseMediumColor}"
+                                               Margin="16,0,0,0" />
+                                    <TextBlock Text="点击查看 ▶"
+                                               Grid.Column="2"
+                                               Grid.RowSpan="2"
+                                               VerticalAlignment="Center"
+                                               FontSize="14"
+                                               Foreground="{DynamicResource SystemAccentColor}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

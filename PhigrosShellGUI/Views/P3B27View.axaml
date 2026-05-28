@@ -1,0 +1,178 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             xmlns:controls="using:PhigrosShellGUI.Controls"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             x:Class="PhigrosShellGUI.Views.P3B27View"
+             x:DataType="vm:P3B27ViewModel">
+
+    <Design.DataContext>
+        <vm:P3B27ViewModel/>
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Spacing="16" Margin="8">
+
+            <!-- ════ 未导入 TSV 提示 ════ -->
+            <Border IsVisible="{Binding HasTsv, Converter={StaticResource InverseBoolConverter}}"
+                    Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="8" Padding="16">
+                <StackPanel Spacing="8" HorizontalAlignment="Center">
+                    <ic:FluentIcon Icon="WarningShield" Foreground="{DynamicResource SystemAccentColor}" />
+                    <TextBlock Text="未导入定数文件"
+                               FontSize="16" FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="请先在设置中导入 Difficulty.TSV 文件以查看 P3B27 数据"
+                               FontSize="13"
+                               Foreground="{DynamicResource SystemBaseMediumColor}"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <!-- ════ Ranking Score ════ -->
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="8" Padding="16"
+                    IsVisible="{Binding HasData}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ic:FluentIcon Icon="DataTrending" />
+                    <TextBlock Text="Ranking Score:" FontSize="15" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding RankingScoreDisplay}"
+                               FontSize="15" FontWeight="Bold"
+                               Foreground="{DynamicResource SystemAccentColor}" />
+                </StackPanel>
+            </Border>
+
+            <!-- ════ P3 区域 ════ -->
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="8" Padding="16"
+                    IsVisible="{Binding HasData}">
+                <StackPanel Spacing="10">
+                    <controls:UniformWrapPanel HorizontalSpacing="8"
+                                               VerticalSpacing="8"
+                                               MinItemWidth="300"
+                                               MaxColumns="3">
+                        <ItemsControl ItemsSource="{Binding P3Items}"
+                                      Background="Transparent"
+                                      BorderThickness="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <controls:UniformWrapPanel HorizontalSpacing="8"
+                                                               VerticalSpacing="8"
+                                                               MinItemWidth="300"
+                                                               MaxColumns="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:P3B27Item">
+                                    <Border Background="{DynamicResource SystemChromeMediumLowColor}"
+                                            CornerRadius="6" Padding="12">
+                                        <StackPanel Spacing="4">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{Binding Rank, StringFormat='P{0}'}"
+                                                           FontSize="14" FontWeight="Bold"
+                                                           Foreground="#FFD700" />
+                                                <TextBlock Text="{Binding RksDisplay}"
+                                                           FontSize="13" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource SystemAccentColor}" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding SongName}"
+                                                       FontSize="13" FontWeight="Medium"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding DifficultyKey, StringFormat='[{0}]'}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource SystemBaseMediumColor}" />
+                                                <TextBlock Text="{Binding Difficulty, StringFormat='Lv.{0:F1}'}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource SystemBaseMediumColor}" />
+                                            </StackPanel>
+                                            <TextBlock FontSize="12">
+                                                <Run Text="{Binding Score, StringFormat={}{0:0000000}}" />
+                                                <Run Text="{Binding RankText}" FontWeight="Bold" />
+                                                <Run Text="{Binding Acc, StringFormat={}{0:F2}%}" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </controls:UniformWrapPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ════ B27 区域 ════ -->
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="8" Padding="16"
+                    IsVisible="{Binding HasData}">
+                <StackPanel Spacing="10">
+                    <Separator />
+                    <controls:UniformWrapPanel HorizontalSpacing="8"
+                                               VerticalSpacing="8"
+                                               MinItemWidth="320"
+                                               MaxColumns="3">
+                        <ItemsControl ItemsSource="{Binding B27Items}"
+                                      Background="Transparent"
+                                      BorderThickness="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <controls:UniformWrapPanel HorizontalSpacing="8"
+                                                               VerticalSpacing="8"
+                                                               MinItemWidth="320"
+                                                               MaxColumns="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:P3B27Item">
+                                    <Border Background="{DynamicResource SystemChromeMediumLowColor}"
+                                            CornerRadius="6" Padding="12">
+                                        <StackPanel Spacing="4">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{Binding Rank, StringFormat='#{0}'}"
+                                                           FontSize="14" FontWeight="Bold" />
+                                                <TextBlock Text="{Binding RksDisplay}"
+                                                           FontSize="13" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource SystemAccentColor}" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding SongName}"
+                                                       FontSize="13" FontWeight="Medium"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding DifficultyKey, StringFormat='[{0}]'}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource SystemBaseMediumColor}" />
+                                                <TextBlock Text="{Binding Difficulty, StringFormat='Lv.{0:F1}'}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource SystemBaseMediumColor}" />
+                                            </StackPanel>
+                                            <TextBlock FontSize="12">
+                                                <Run Text="{Binding Score, StringFormat={}{0:0000000}}" />
+                                                <Run Text="{Binding RankText}" FontWeight="Bold" />
+                                                <Run Text="{Binding Acc, StringFormat={}{0:F2}%}" />
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding ExpectedAcc, StringFormat='↑ {0}'}"
+                                                       FontSize="11"
+                                                       Foreground="#4CAF50"
+                                                       IsVisible="{Binding ExpectedAcc, Converter={StaticResource NotNullConverter}}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </controls:UniformWrapPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ════ 无数据提示 ════ -->
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="8" Padding="16"
+                    IsVisible="{Binding HasData, Converter={StaticResource InverseBoolConverter}}">
+                <TextBlock Text="暂无存档数据"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource SystemBaseMediumColor}" />
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

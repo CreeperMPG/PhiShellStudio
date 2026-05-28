@@ -1,0 +1,128 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             x:Class="PhigrosShellGUI.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+
+    <Design.DataContext>
+        <vm:LoginViewModel/>
+    </Design.DataContext>
+
+    <Grid MinWidth="300"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          Margin="16,8">
+
+        <!-- ════ 普通登录视图（Token 输入 + QR 按钮） ════ -->
+        <StackPanel IsVisible="{Binding IsQrActive, Converter={StaticResource InverseBoolConverter}}"
+                    Spacing="8">
+
+            <TextBlock Text="登录以管理存档"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,12" />
+            <TextBox Text="{Binding Token}"
+                     PlaceholderText="在此输入 SessionToken..."
+                     Height="34" />
+            <Button Command="{Binding LoginWithTokenCommand}"
+                    HorizontalAlignment="Stretch"
+                    Height="36"
+                    VerticalContentAlignment="Center"
+                    Content="Token 登录" />
+            <!-- 记住登录 -->
+            <CheckBox IsChecked="{Binding RememberLogin}"
+                      Content="记住登录"
+                      FontSize="12"
+                      VerticalContentAlignment="Center"
+                      Margin="4,0,0,0" />
+
+            <!-- 分隔 -->
+            <TextBlock Text="─ 或者 ─"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                       Margin="0,4" />
+
+            <!-- QR 扫码按钮 -->
+            <Button Command="{Binding LoginWithQRCommand}"
+                    HorizontalAlignment="Stretch"
+                    Height="36"
+                    VerticalContentAlignment="Center"
+                    Content="📱 扫码登录" />
+
+            <!-- 状态信息（Token 登录时显示） -->
+            <ProgressBar IsIndeterminate="True"
+                         IsVisible="{Binding IsLoading}"
+                         Height="4"
+                         Margin="0,4,0,0" />
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="{DynamicResource SystemAccentColor}"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Foreground="#E04040"
+                       HorizontalAlignment="Center"
+                       TextWrapping="Wrap" />
+        </StackPanel>
+
+        <!-- ════ 扫码登录视图（QR 码 + 轮询状态） ════ -->
+        <StackPanel IsVisible="{Binding IsQrActive}"
+                    Spacing="12"
+                    HorizontalAlignment="Center">
+
+            <!-- 状态文字 -->
+            <TextBlock Text="{Binding QrStatusText}"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource SystemAccentColor}"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center" />
+
+            <!-- QR 码图片 -->
+            <Border CornerRadius="8"
+                    Background="White"
+                    Padding="8"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding QrCodeBitmap, Converter={StaticResource NotNullConverter}}">
+                <Image Source="{Binding QrCodeBitmap}"
+                       Width="220" Height="220"
+                       Stretch="Fill" />
+            </Border>
+
+            <!-- QR 码 URL 文本（可点击复制） -->
+            <TextBlock Text="{Binding QrCodeUrl}"
+                       FontSize="11"
+                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                       HorizontalAlignment="Center"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       MaxWidth="300" />
+
+            <!-- 扫码状态提示 -->
+            <TextBlock Text="{Binding QrStatusText}"
+                       FontSize="12"
+                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center" />
+
+            <!-- 错误信息 -->
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Foreground="#E04040"
+                       FontSize="12"
+                       FontWeight="Medium"
+                       HorizontalAlignment="Center"
+                       TextWrapping="Wrap"
+                       MaxWidth="300"
+                       IsVisible="{Binding ErrorMessage, Converter={StaticResource NotNullConverter}}" />
+
+            <!-- 取消按钮 -->
+            <Button Command="{Binding CancelQrLoginCommand}"
+                    HorizontalAlignment="Center"
+                    MinWidth="100"
+                    Padding="16,6"
+                    VerticalContentAlignment="Center"
+                    Content="取消" />
+        </StackPanel>
+
+    </Grid>
+</UserControl>

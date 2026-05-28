@@ -1,0 +1,111 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             x:Class="PhigrosShellGUI.Views.SongRecordsView"
+             x:DataType="vm:SongRecordsViewModel"
+             x:Name="ucRoot">
+
+    <Design.DataContext>
+        <vm:SongRecordsViewModel/>
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <!-- ════ 卡片内容模板（不含卡片边框/阴影——由外层卡片 Border 提供） ════ -->
+        <DataTemplate x:Key="SongCardTemplate"
+                      x:DataType="vm:SongRecordViewModel">
+            <StackPanel Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding SongId}"
+                               FontSize="15" FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                    <Button Grid.Column="1" Width="24" Height="24" Padding="0"
+                            Background="Transparent" ToolTip.Tip="编辑成绩"
+                            Command="{Binding EditCommand}" CommandParameter="{Binding}">
+                        <PathIcon Data="{StaticResource EditIconGeometry}"
+                                  Width="11" Height="11" />
+                    </Button>
+                </Grid>
+                <Separator />
+                <ItemsControl ItemsSource="{Binding Difficulties}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DifficultyDisplayItem">
+                            <Border IsVisible="{Binding Exists}" Padding="4,2" Margin="0,1">
+                                <Grid ColumnDefinitions="20,50,*,Auto" ColumnSpacing="6">
+                                    <TextBlock Text="{Binding DifficultyName}"
+                                               FontWeight="Bold" FontSize="13"
+                                               VerticalAlignment="Center" Grid.Column="0" />
+									<TextBlock Grid.Column="1"
+                                               Text="{Binding DifficultyConstant, StringFormat='Lv.{0}'}"
+                                               FontSize="11" FontWeight="Bold"
+                                               VerticalAlignment="Center" Margin="4,0,0,0" />
+									<StackPanel Orientation="Horizontal" Spacing="4"
+                                                VerticalAlignment="Center" Grid.Column="2">
+										<TextBlock Text="{Binding Score}" FontSize="13" />
+										<TextBlock Text="·" FontSize="13"
+                                                   Foreground="{DynamicResource SystemAccentColor}" />
+										<TextBlock Text="{Binding Acc}" FontSize="13" />
+									</StackPanel>
+									<Border Grid.Column="3"
+                                            Background="{DynamicResource SystemAccentColor}"
+                                            CornerRadius="4" Padding="6,2" Margin="4,0,0,0">
+										<TextBlock Text="{Binding Rank}" FontSize="11"
+                                                   Foreground="White" FontWeight="Medium" />
+									</Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <!-- ════ 搜索栏 ════ -->
+        <Border DockPanel.Dock="Top" Padding="16,12" Background="Transparent">
+            <StackPanel Spacing="4">
+                <TextBox Text="{Binding SearchText}"
+                         PlaceholderText="输入歌曲 ID 进行筛选..." MaxLines="1" />
+            </StackPanel>
+        </Border>
+
+        <!-- ════ 虚拟化行列表（ItemsControl + ScrollViewer，无选中/无 hover 干扰） ════ -->
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding FilteredRows}" Background="Transparent">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Margin="8,8,8,0" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SongRecordRowViewModel">
+                        <Border Background="Transparent" Padding="0" Margin="0,0,0,24">
+                            <ItemsControl ItemsSource="{Binding Cards}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <primitives:UniformGrid Columns="{Binding Columns}" Rows="1" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:SongRecordViewModel">
+                                        <Border Background="{DynamicResource SystemChromeLowColor}"
+                                                CornerRadius="10" Padding="16"
+                                                BoxShadow="0 2 12 0 #30000000"
+                                                MinWidth="280"
+                                                Margin="8,8">
+                                            <ContentControl Content="{Binding .}"
+                                                            ContentTemplate="{StaticResource SongCardTemplate}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

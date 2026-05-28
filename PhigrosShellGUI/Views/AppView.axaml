@@ -1,0 +1,255 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             xmlns:views="using:PhigrosShellGUI.Views"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             x:Class="PhigrosShellGUI.Views.AppView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*"
+          Background="{DynamicResource SystemChromeMediumLowColor}">
+        <!-- ════ 全局顶栏 ════ -->
+        <Border Grid.Row="0"
+                Height="44"
+                Padding="16,0"
+                Background="{DynamicResource SystemChromeLowColor}"
+                ZIndex="10">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- 应用标题 -->
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <ic:FluentIcon Icon="MusicNote1" />
+                    <TextBlock Text="PhiShell Studio"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- 右侧操作区 -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            VerticalAlignment="Center">
+                    <Button Width="40"
+                            Height="32"
+                            Padding="0"
+                            Background="Transparent"
+                            VerticalContentAlignment="Center"
+                            ToolTip.Tip="关于"
+                            Command="{Binding OpenAboutCommand}">
+                        <ic:FluentIcon Icon="Info" VerticalAlignment="Center" />
+                    </Button>
+                    <Button Width="40"
+                            Height="32"
+                            Padding="0"
+                            Background="Transparent"
+                            VerticalContentAlignment="Center"
+                            ToolTip.Tip="设置"
+                            Command="{Binding OpenSettingsCommand}">
+                        <ic:FluentIcon Icon="SettingsCogMultiple" VerticalAlignment="Center" />
+                    </Button>
+                    <Button Height="32"
+                            Padding="10,0"
+                            Background="Transparent"
+                            VerticalContentAlignment="Center"
+                            ToolTip.Tip="登录以管理云存档"
+                            Command="{Binding OpenLoginOverlayCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <ic:FluentIcon Icon="PersonAccounts" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding LoginButtonText}" FontSize="12" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ════ 页面内容 ════ -->
+        <Border Grid.Row="1">
+            <ContentControl Content="{Binding CurrentView}"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch" />
+        </Border>
+
+        <!-- ════ 全局 Data 编辑 Overlay ════ -->
+        <Border IsVisible="{Binding IsDataEditOverlayVisible}"
+                Background="#80000000"
+                Grid.RowSpan="2"
+                ZIndex="200">
+            <Border DataContext="{Binding DataEditVM}"
+                    x:DataType="vm:DataEditViewModel"
+                    Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="12"
+                    Padding="20"
+                    MaxWidth="460"
+                    MaxHeight="400"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 20 0 #50000000">
+                <StackPanel Spacing="14">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <ic:FluentIcon Icon="MoneyCalculator" />
+                        <TextBlock Text="Data 设置" FontSize="18" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <Separator />
+                    <TextBlock Text="按单位输入：" FontSize="13" Foreground="{DynamicResource SystemAccentColor}" />
+                    <Grid ColumnDefinitions="*,*,*,*,*"
+                          RowDefinitions="Auto,Auto"
+                          ColumnSpacing="6"
+                          RowSpacing="4">
+                        <TextBlock Text="PB" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" FontSize="12" />
+                        <TextBlock Text="TB" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" FontSize="12" />
+                        <TextBlock Text="GB" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" FontSize="12" />
+                        <TextBlock Text="MB" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Center" FontSize="12" />
+                        <TextBlock Text="KB" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Center" FontSize="12" />
+                        <TextBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch"
+                                 Text="{Binding ValuePB}" TextAlignment="Center" MaxLines="1" />
+                        <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch"
+                                 Text="{Binding ValueTB}" TextAlignment="Center" MaxLines="1" />
+                        <TextBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch"
+                                 Text="{Binding ValueGB}" TextAlignment="Center" MaxLines="1" />
+                        <TextBox Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch"
+                                 Text="{Binding ValueMB}" TextAlignment="Center" MaxLines="1" />
+                        <TextBox Grid.Row="1" Grid.Column="4" HorizontalAlignment="Stretch"
+                                 Text="{Binding ValueKB}" TextAlignment="Center" MaxLines="1" />
+                    </Grid>
+                    <TextBlock Text="提示：输入超过 1023 会自动进位"
+                               FontSize="11" Foreground="{DynamicResource SystemAccentColor}"
+                               FontStyle="Italic" HorizontalAlignment="Center" />
+                    <Separator />
+                    <TextBlock Text="或者，直接输入 KB 总数：" FontSize="13" Foreground="{DynamicResource SystemAccentColor}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <TextBox Grid.Column="0" Text="{Binding TotalKB}" TextAlignment="Right" MaxLines="1" />
+                        <TextBlock Grid.Column="1" Text="KB" VerticalAlignment="Center" FontSize="14" FontWeight="Medium" />
+                    </Grid>
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#E04040" FontSize="12" FontWeight="Medium" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <Button Content="取消" MinWidth="80" Padding="12,6" VerticalContentAlignment="Center" Command="{Binding CancelCommand}" />
+                        <Button Content="确定" MinWidth="80" Padding="12,6" VerticalContentAlignment="Center"
+                                Background="{DynamicResource SystemAccentColor}" Foreground="White"
+                                Command="{Binding ConfirmCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- ════ 全局歌曲成绩编辑 Overlay ════ -->
+        <Border IsVisible="{Binding IsRecordEditOverlayVisible}"
+                Background="#80000000" Grid.RowSpan="2" ZIndex="200">
+            <ContentControl Content="{Binding RecordEditVM}"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" />
+        </Border>
+
+        <!-- ════ 全局关于 Overlay ════ -->
+        <Border IsVisible="{Binding IsAboutOverlayVisible}"
+                Background="#80000000" Grid.RowSpan="2" ZIndex="200">
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="12"
+                    Padding="24"
+                    MaxWidth="480"
+                    MaxHeight="520"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 20 0 #50000000">
+                <StackPanel Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ic:FluentIcon Icon="InfoSparkle" />
+                        <TextBlock Text="关于 PhiShell Studio"
+                                   FontSize="18" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <Separator />
+
+                    <TextBlock Text="PhiShell Studio"
+                               FontSize="15" FontWeight="Medium" />
+                    <TextBlock Text="Phigros 存档修改工具"
+                               FontSize="13"
+                               Foreground="{DynamicResource SystemBaseMediumColor}" />
+                    <TextBlock Text="{Binding AppVersion}"
+                               FontSize="13"
+                               Foreground="{DynamicResource SystemAccentColor}" />
+
+                    <TextBlock Text="作者"
+                               FontSize="12"
+                               Foreground="{DynamicResource SystemAccentColor}" />
+                    <TextBlock Text="CreeperMPG"
+                               FontSize="16" FontWeight="SemiBold" />
+
+                    <Separator />
+
+                    <TextBlock Text="更新日志"
+                               FontSize="13"
+                               Foreground="{DynamicResource SystemAccentColor}" />
+                    <ScrollViewer MaxHeight="200"
+                                  Background="{DynamicResource SystemChromeMediumLowColor}"
+                                  CornerRadius="6"
+                                  Padding="10">
+                        <TextBlock Text="{Binding ChangelogText}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap" />
+                    </ScrollViewer>
+
+                    <Separator />
+                    <Button Content="关闭"
+                            HorizontalAlignment="Right"
+                            MinWidth="80" Padding="12,6"
+                            VerticalContentAlignment="Center"
+                            Command="{Binding CloseAboutCommand}" />
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- ════ 全局设置 Overlay ════ -->
+        <Border IsVisible="{Binding IsSettingsOverlayVisible}"
+                Background="#80000000" Grid.RowSpan="2" ZIndex="200">
+            <ContentControl Content="{Binding SettingsVM}"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" />
+        </Border>
+
+        <!-- ════ 全局登录 Overlay ════ -->
+        <Border IsVisible="{Binding IsLoginOverlayVisible}"
+                Background="#80000000" Grid.RowSpan="2" ZIndex="200">
+            <Border Background="{DynamicResource SystemChromeLowColor}"
+                    CornerRadius="12"
+                    Padding="24"
+                    MaxWidth="420"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 20 0 #50000000">
+                <StackPanel Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+                        <ic:FluentIcon Icon="PersonAccounts" />
+                        <TextBlock Text="登录" FontSize="18" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <Separator />
+
+                    <!-- 登录内容（复用 LoginViewModel） -->
+                    <ContentControl Content="{Binding LoginVM}"
+                                    HorizontalContentAlignment="Stretch" />
+
+                    <!-- 上次登录提示（带 Command 的 Button，样式仿链接） -->
+                    <Button Content="{Binding LastLoginHint}"
+                            IsVisible="{Binding HasLastLoginHint}"
+                            FontSize="12"
+                            Foreground="{DynamicResource SystemAccentColor}"
+                            HorizontalAlignment="Center"
+                            Background="Transparent"
+                            Padding="4,2"
+                            VerticalContentAlignment="Center"
+                            Cursor="Hand"
+                            Command="{Binding AutoLoginWithSavedTokenCommand}" />
+
+                    <!-- 取消按钮 -->
+                    <Separator />
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                        <Button Content="取消" MinWidth="80" Padding="12,6" VerticalContentAlignment="Center"
+                                Command="{Binding CloseLoginOverlayCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

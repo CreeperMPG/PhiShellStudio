@@ -1,0 +1,162 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhigrosShellGUI.ViewModels"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             x:Class="PhigrosShellGUI.Views.RecordEditView"
+             x:DataType="vm:RecordEditViewModel">
+
+    <Design.DataContext>
+        <vm:RecordEditViewModel/>
+    </Design.DataContext>
+
+    <Border Background="{DynamicResource SystemChromeLowColor}"
+            CornerRadius="12"
+            Padding="20"
+            MaxWidth="520"
+            MaxHeight="500"
+            BoxShadow="0 4 20 0 #50000000">
+        <StackPanel Spacing="12">
+
+            <!-- 标题 -->
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <ic:FluentIcon Icon="MusicNote1" />
+                    <TextBlock Text="{Binding Title}"
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+            <Separator />
+
+            <!-- 表头 -->
+            <Border Padding="0,0,0,4">
+            <Grid ColumnDefinitions="50,*,*,60,Auto,36"
+                  ColumnSpacing="4">
+                <TextBlock Text="难度" Grid.Column="0"
+                           FontSize="12" FontWeight="Bold"
+                           Foreground="{DynamicResource SystemAccentColor}" />
+                <TextBlock Text="分数 (0-1000000)" Grid.Column="1"
+                           FontSize="12" FontWeight="Bold"
+                           Foreground="{DynamicResource SystemAccentColor}" />
+                <TextBlock Text="ACC (0-100)" Grid.Column="2"
+                           FontSize="12" FontWeight="Bold"
+                           Foreground="{DynamicResource SystemAccentColor}" />
+                <TextBlock Text="FC" Grid.Column="3"
+                           FontSize="12" FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource SystemAccentColor}" />
+                <TextBlock Text="定数" Grid.Column="4"
+                           FontSize="12" FontWeight="Bold"
+                           Foreground="{DynamicResource SystemAccentColor}" />
+            </Grid>
+            </Border>
+
+            <!-- 可编辑行 -->
+            <ScrollViewer MaxHeight="260">
+                <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DifficultyFieldViewModel">
+                            <Border IsVisible="{Binding Exists}"
+                                    Padding="4,3"
+                                    Margin="0,1"
+                                    Background="{DynamicResource SystemChromeMediumLowColor}"
+                                    CornerRadius="6">
+                                <Grid ColumnDefinitions="50,*,*,60,Auto,36"
+                                      ColumnSpacing="4">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontWeight="Bold"
+                                               FontSize="14"
+                                               VerticalAlignment="Center"
+                                               Grid.Column="0" />
+
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding Score}"
+                                             MaxLines="1"
+                                             Padding="6,3"
+                                             FontSize="13" />
+
+                                    <TextBox Grid.Column="2"
+                                             Text="{Binding Acc}"
+                                             MaxLines="1"
+                                             Padding="6,3"
+                                             FontSize="13" />
+
+                                    <CheckBox Grid.Column="3"
+                                              IsChecked="{Binding Fc}"
+                                              HorizontalAlignment="Center" />
+
+                                    <TextBlock Grid.Column="4"
+                                               Text="{Binding DifficultyConstant}"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SystemAccentColor}"
+                                               VerticalAlignment="Center"
+                                               Margin="4,0,0,0" />
+
+                                    <!-- 删除按钮 -->
+                                    <Button Grid.Column="5"
+                                            Width="22" Height="22"
+                                            Padding="0"
+                                            Background="Transparent"
+                                            VerticalContentAlignment="Center"
+                                            ToolTip.Tip="移除该难度"
+                                            Command="{Binding RemoveSelfCommand}">
+                                        <TextBlock Text="✕" FontSize="11"
+                                                   Foreground="#E04040"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- 添加难度 -->
+            <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" IsVisible="{Binding HasAvailableDifficulties}">
+                <ComboBox ItemsSource="{Binding AvailableDifficulties}"
+                          SelectedItem="{Binding SelectedDifficultyToAdd}"
+                          PlaceholderText="选择要添加的难度…"
+                          MinWidth="160"
+                          Height="30"
+                          VerticalContentAlignment="Center" />
+                <Button Padding="12,4"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding AddDifficultyCommand}"
+                        IsEnabled="{Binding CanAddDifficulty}">
+                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="添加难度" FontSize="13" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!-- 错误信息 -->
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Foreground="#E04040"
+                       FontSize="12"
+                       FontWeight="Medium"
+                       MaxHeight="60"
+                       TextWrapping="Wrap" />
+
+            <!-- 按钮 -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8">
+                <Button Content="取消"
+                        MinWidth="80"
+                        Padding="12,6"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding CancelCommand}" />
+                <Button Content="确定"
+                        MinWidth="80"
+                        Padding="12,6"
+                        Background="{DynamicResource SystemAccentColor}"
+                        Foreground="White"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding ConfirmCommand}" />
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+</UserControl>
