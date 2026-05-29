@@ -38,8 +38,12 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_26.3.app
           xcodebuild -version
 
-      - name: Install iOS workload
-        run: dotnet workload install ios
+      - name: Force reinstall iOS workload (compatible with Xcode 26.3)
+        run: |
+          dotnet workload uninstall ios 2>/dev/null || true
+          rm -rf /Users/runner/.dotnet/packs/Microsoft.iOS.Sdk.net10.0_26.5*
+          dotnet workload install ios
+          dotnet workload list
 
       - name: Publish iOS app
         run: |
