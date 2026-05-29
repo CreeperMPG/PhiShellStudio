@@ -26,6 +26,7 @@ jobs:
         with:
           repository: CreeperMPG/PhigrosArchive
           path: PhigrosArchive
+          token: ${{ secrets.GH_PAT }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
