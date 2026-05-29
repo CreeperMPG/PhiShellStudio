@@ -1,0 +1,54 @@
+name: Build iOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build configuration'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Debug
+          - Release
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout PhiShellStudio
+        uses: actions/checkout@v4
+        with:
+          path: PhiShellStudio
+
+      - name: Checkout PhigrosArchive
+        uses: actions/checkout@v4
+        with:
+          repository: CreeperMPG/PhigrosArchive
+          path: PhigrosArchive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Install iOS workload
+        run: dotnet workload install ios
+
+      - name: Publish iOS app
+        run: |
+          cd PhiShellStudio/PhigrosShellGUI.iOS
+          dotnet publish -f net10.0-ios \
+            -c ${{ inputs.configuration }} \
+            -r ios-arm64 \
+            --self-contained \
+            -p:ArchiveOnBuild=true \
+            -p:BuildIpa=true \
+            -p:CodesignKey=- \
+            -p:CodesignProvision=-
+
+      - name: Upload .ipa artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhiShellStudio-iOS-${{ inputs.configuration }}
+          path: PhiShellStudio/PhigrosShellGUI.iOS/bin/${{ inputs.configuration }}/net10.0-ios/ios-arm64/publish/*.ipa
