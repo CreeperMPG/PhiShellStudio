@@ -28,27 +28,23 @@ jobs:
           path: PhigrosArchive
           token: ${{ secrets.GH_PAT }}
 
-      - name: Setup .NET 10.0.103 (older, for Xcode 26.3 compatibility)
+      - name: Setup .NET 9 (for iOS build)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.103'
+          dotnet-version: '9.x'
 
-      - name: Select Xcode 26.3
+      - name: Select Xcode 16.4
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.3.app
+          sudo xcode-select -s /Applications/Xcode_16.4.app
           xcodebuild -version
 
-      - name: Force reinstall iOS workload (compatible with Xcode 26.3)
-        run: |
-          dotnet workload uninstall ios 2>/dev/null || true
-          rm -rf /Users/runner/.dotnet/packs/Microsoft.iOS.Sdk.net10.0_26.5*
-          dotnet workload install ios
-          dotnet workload list
+      - name: Install iOS workload
+        run: dotnet workload install ios
 
       - name: Publish iOS app
         run: |
           cd PhiShellStudio/PhigrosShellGUI.iOS
-          dotnet publish -f net10.0-ios \
+          dotnet publish -f net9.0-ios \
             -c ${{ inputs.configuration }} \
             -r ios-arm64 \
             --self-contained \
@@ -61,4 +57,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: PhiShellStudio-iOS-${{ inputs.configuration }}
-          path: PhiShellStudio/PhigrosShellGUI.iOS/bin/${{ inputs.configuration }}/net10.0-ios/ios-arm64/publish/*.ipa
+          path: PhiShellStudio/PhigrosShellGUI.iOS/bin/${{ inputs.configuration }}/net9.0-ios/ios-arm64/publish/*.ipa
