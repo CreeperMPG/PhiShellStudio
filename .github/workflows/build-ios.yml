@@ -28,10 +28,10 @@ jobs:
           path: PhigrosArchive
           token: ${{ secrets.GH_PAT }}
 
-      - name: Setup .NET
+      - name: Setup .NET 10.0.103 (older, for Xcode 26.3 compatibility)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.x'
+          dotnet-version: '10.0.103'
 
       - name: Select Xcode 26.3
         run: |
