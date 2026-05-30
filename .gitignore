@@ -1,37 +1,21 @@
-# .NET
+# Keystore & sensitive config
+phigrosshell.keystore
+PhigrosShellGUI.Android/PhigrosShellGUI.Android.csproj
+*.keystore
+*.jks
+
+# Build artifacts
 bin/
 obj/
+
+# IDE
+.vs/
+
+# VS user files
 *.user
 *.suo
-*.sln.docstates
-*.userprefs
-
-# NuGet
-packages/
-*.nupkg
-**/[Pp]ackages/*
-
-# Build
-[Bb]uild/
-[Dd]ebug/
-[Rr]elease/
-x64/
-x86/
-
-# Publish
+PublishProfiles/
 publish/
 
-# VS
-.vs/
-*.csproj.user
-*.csproj.dotnet-user.json
-
-# Rider
-.idea/
-*.sln.iml
-
-# macOS
-.DS_Store
-
-# Releases
+# Release artifacts
 Releases/
