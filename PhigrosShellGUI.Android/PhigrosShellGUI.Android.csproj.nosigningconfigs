@@ -5,6 +5,7 @@
     <OutputType>Exe</OutputType>
     <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
     <PublishTrimmed>true</PublishTrimmed>
+
     <ApplicationLabel>PhiShell Studio</ApplicationLabel>
     <AndroidKeyStore>true</AndroidKeyStore>
   </PropertyGroup>

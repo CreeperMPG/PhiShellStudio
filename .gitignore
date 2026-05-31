@@ -20,6 +20,3 @@ publish/
 # Release artifacts
 Releases/
 dist/
-
-# Build-generated config copies
-*.csproj.nosigningconfigs
