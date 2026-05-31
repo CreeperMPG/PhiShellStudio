@@ -4,7 +4,6 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
-    <RuntimeIdentifiers>android-arm64;android-arm;android-x64</RuntimeIdentifiers>
     <PublishTrimmed>true</PublishTrimmed>
     <ApplicationLabel>PhiShell Studio</ApplicationLabel>
     <AndroidKeyStore>true</AndroidKeyStore>

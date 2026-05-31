@@ -5,22 +5,11 @@ set "SCRIPT_DIR=%~dp0"
 set "DESKTOP_PROJECT=%SCRIPT_DIR%PhigrosShellGUI.Desktop"
 set "DIST_DIR=%SCRIPT_DIR%dist\desktop"
 
-REM Extract version from app.manifest
-for /f "tokens=3 delims== " %%a in ('findstr "assemblyIdentity" "%DESKTOP_PROJECT%\app.manifest"') do (
-    set "APP_VERSION=%%~a"
-    goto :version_found
-)
-:version_found
-REM Extract just the version value (remove version=" prefix)
-set "APP_VERSION=!APP_VERSION:version=!"
-set "APP_VERSION=!APP_VERSION:"=!"
-set "APP_VERSION=!APP_VERSION:==!"
-if "%APP_VERSION%"=="" set "APP_VERSION=dev"
-
 echo ============================================
 echo   PhiShell Studio - Desktop Build Script
-echo   Version: %APP_VERSION%
 echo ============================================
+echo Target: net10.0 (Release)
+echo Output: %DIST_DIR%
 echo.
 
 REM Clean dist directory
@@ -31,8 +20,7 @@ REM ========== 1/2: Windows x64 ==========
 echo [1/2] Building Windows x64...
 "%DOTNET_ROOT%\dotnet.exe" publish "%DESKTOP_PROJECT%" ^
     -f net10.0 -c Release -r win-x64 ^
-    -p:PublishSingleFile=true ^
-    -p:DebugType=None ^
+    -p:DebugType=none ^
     -p:DebugSymbols=false ^
     -o "%DIST_DIR%\win-x64"
 if errorlevel 1 (
@@ -46,8 +34,7 @@ REM ========== 2/2: Linux x64 ==========
 echo [2/2] Building Linux x64 (cross-compile)...
 "%DOTNET_ROOT%\dotnet.exe" publish "%DESKTOP_PROJECT%" ^
     -f net10.0 -c Release -r linux-x64 ^
-    -p:PublishSingleFile=true ^
-    -p:DebugType=None ^
+    -p:DebugType=none ^
     -p:DebugSymbols=false ^
     -o "%DIST_DIR%\linux-x64"
 if errorlevel 1 (
@@ -59,39 +46,27 @@ echo.
 
 REM ========== Summary ==========
 echo ============================================
-echo   ✅ All builds complete!
-echo   Version: %APP_VERSION%
+echo   All builds complete!
 echo   Output: %DIST_DIR%
 echo ============================================
 echo.
-
-REM Rename executables
-if exist "%DIST_DIR%\win-x64\PhigrosShellGUI.Desktop.exe" (
-    ren "%DIST_DIR%\win-x64\PhigrosShellGUI.Desktop.exe" "PhiShellStudio-win-x64.exe"
-    echo   win-x64: PhiShellStudio-win-x64.exe
-)
-if exist "%DIST_DIR%\linux-x64\PhigrosShellGUI.Desktop" (
-    ren "%DIST_DIR%\linux-x64\PhigrosShellGUI.Desktop" "PhiShellStudio-linux-x64"
-    echo   linux-x64: PhiShellStudio-linux-x64
-)
-if exist "%DIST_DIR%\linux-x64\PhigrosShellGUI.Desktop.exe" (
-    ren "%DIST_DIR%\linux-x64\PhigrosShellGUI.Desktop.exe" "PhiShellStudio-linux-x64.exe"
-    echo   linux-x64: PhiShellStudio-linux-x64.exe
-)
-
+dir /B "%DIST_DIR%\win-x64\PhigrosShellGUI.Desktop.exe" "%DIST_DIR%\linux-x64\PhigrosShellGUI.Desktop" 2>nul
 echo.
-dir /B "%DIST_DIR%\win-x64\*.exe" "%DIST_DIR%\linux-x64\*" 2>nul
+
+REM Strip PDB files (native SkiaSharp PDBs are 100MB+)
+del /S /Q "%DIST_DIR%\win-x64\*.pdb" 2>nul
+del /S /Q "%DIST_DIR%\linux-x64\*.pdb" 2>nul
+echo [Cleanup] PDB symbols removed, size should now be ~20MB
 echo.
 
 REM Copy to Releases folder
-set "RELEASE_DIR=%SCRIPT_DIR%Releases\%APP_VERSION%"
+set "RELEASE_DIR=%SCRIPT_DIR%Releases"
 if not exist "%RELEASE_DIR%\win-x64" mkdir "%RELEASE_DIR%\win-x64"
 if not exist "%RELEASE_DIR%\linux-x64" mkdir "%RELEASE_DIR%\linux-x64"
 
-for %%f in ("%DIST_DIR%\win-x64\*.exe") do copy /Y "%%f" "%RELEASE_DIR%\win-x64\" >nul
-for %%f in ("%DIST_DIR%\linux-x64\*") do copy /Y "%%f" "%RELEASE_DIR%\linux-x64\" >nul
+xcopy /E /I /Y "%DIST_DIR%\win-x64" "%RELEASE_DIR%\win-x64" >nul
+xcopy /E /I /Y "%DIST_DIR%\linux-x64" "%RELEASE_DIR%\linux-x64" >nul
 
 echo   Also copied to: %RELEASE_DIR%
 echo.
-
 pause

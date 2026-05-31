@@ -5,85 +5,101 @@ set "SCRIPT_DIR=%~dp0"
 set "ANDROID_PROJECT=%SCRIPT_DIR%PhigrosShellGUI.Android"
 set "DIST_DIR=%SCRIPT_DIR%dist\android"
 
-REM Extract version from AndroidManifest.xml
-for /f "tokens=2 delims== " %%a in ('findstr "versionName" "%ANDROID_PROJECT%\Properties\AndroidManifest.xml"') do (
-    set "APP_VERSION=%%~a"
-    goto :version_found
-)
-:version_found
-REM Remove quotes from version if any
-set "APP_VERSION=%APP_VERSION:"=%"
-if "%APP_VERSION%"=="" set "APP_VERSION=dev"
-
 echo ============================================
 echo   PhiShell Studio - Android Build Script
-echo   Version: %APP_VERSION%
 echo ============================================
-echo.
 echo Target: net10.0-android (Release)
 echo Output: %DIST_DIR%
 echo.
 
-REM Clean dist directory
+REM ----- Detect dotnet -----
+set "DOTNET_CMD=dotnet"
+where dotnet >nul 2>&1
+if errorlevel 1 (
+    if defined DOTNET_ROOT (
+        set "DOTNET_CMD=%DOTNET_ROOT%\dotnet.exe"
+    ) else if exist "C:\Program Files\dotnet\dotnet.exe" (
+        set "DOTNET_CMD=C:\Program Files\dotnet\dotnet.exe"
+    ) else (
+        echo [ERROR] dotnet not found in PATH, DOTNET_ROOT, or default location.
+        echo         Install .NET SDK or set DOTNET_ROOT environment variable.
+        exit /b 1
+    )
+)
+echo Using: !DOTNET_CMD!
+!DOTNET_CMD! --version
+echo.
+
+REM ----- Clean dist -----
 if exist "%DIST_DIR%" rmdir /S /Q "%DIST_DIR%"
 mkdir "%DIST_DIR%"
 
-REM ========== 1/3: ARM64-v8a ==========
-echo [1/3] Building ARM64-v8a (android-arm64)...
-"%DOTNET_ROOT%\dotnet.exe" publish "%ANDROID_PROJECT%" ^
-    -f net10.0-android -c Release -r android-arm64 --self-contained ^
-    -p:AndroidPackageOutputPath="%DIST_DIR%\arm64-v8a"
-if errorlevel 1 (
-    echo [ERROR] ARM64-v8a build failed!
-    exit /b 1
-)
-echo [OK] ARM64-v8a build complete
-echo.
+REM ----- Architecture list -----
+set ARCH_LIST=android-arm64 android-arm android-x64
+set ARCH_LABEL[android-arm64]=ARM64-v8a
+set ARCH_LABEL[android-arm]=armeabi-v7a
+set ARCH_LABEL[android-x64]=X86_64
 
-REM ========== 2/3: ARMEABI-v7a ==========
-echo [2/3] Building ARMEABI-v7a (android-arm)...
-"%DOTNET_ROOT%\dotnet.exe" publish "%ANDROID_PROJECT%" ^
-    -f net10.0-android -c Release -r android-arm --self-contained ^
-    -p:AndroidPackageOutputPath="%DIST_DIR%\armeabi-v7a"
-if errorlevel 1 (
-    echo [ERROR] ARMEABI-v7a build failed!
-    exit /b 1
-)
-echo [OK] ARMEABI-v7a build complete
-echo.
+REM armeabi-v7a 需要 Mono 运行时（CoreCLR 不支持 32-bit ARM）
+set USE_MONO[android-arm]=true
 
-REM ========== 3/3: X86_64 ==========
-echo [3/3] Building X86_64 (android-x64)...
-"%DOTNET_ROOT%\dotnet.exe" publish "%ANDROID_PROJECT%" ^
-    -f net10.0-android -c Release -r android-x64 --self-contained ^
-    -p:AndroidPackageOutputPath="%DIST_DIR%\x86_64"
-if errorlevel 1 (
-    echo [ERROR] X86_64 build failed!
-    exit /b 1
+for %%R in (%ARCH_LIST%) do (
+    set "ARCH_LABEL=!ARCH_LABEL[%%R]!"
+    set "MONO_FLAG=!USE_MONO[%%R]!"
+    echo ========== [!ARCH_LABEL!] Building %%R ...
+    
+    if defined MONO_FLAG (
+        !DOTNET_CMD! publish "%ANDROID_PROJECT%" ^
+            -f net10.0-android -c Release -r %%R --self-contained ^
+            -p:UseMonoRuntime=true
+    ) else (
+        !DOTNET_CMD! publish "%ANDROID_PROJECT%" ^
+            -f net10.0-android -c Release -r %%R --self-contained
+    )
+    
+    if errorlevel 1 (
+        echo [ERROR] [!ARCH_LABEL!] Build failed!
+        exit /b 1
+    )
+    
+    REM Copy built APKs from standard output path
+    set "PUBLISH_DIR=%ANDROID_PROJECT%\bin\Release\net10.0-android\%%R\publish"
+    if exist "!PUBLISH_DIR!" (
+        mkdir "%DIST_DIR%\%%R" >nul 2>&1
+        copy /Y "!PUBLISH_DIR!\*.apk" "%DIST_DIR%\%%R\" >nul 2>&1
+        copy /Y "!PUBLISH_DIR!\*.aab" "%DIST_DIR%\%%R\" >nul 2>&1
+        echo [OK] [!ARCH_LABEL!] Build complete
+    ) else (
+        echo [WARN] [!ARCH_LABEL!] Publish directory not found: !PUBLISH_DIR!
+        echo        APK may still be in project output. Check manually.
+    )
+    echo.
 )
-echo [OK] X86_64 build complete
-echo.
 
 REM ========== Summary ==========
 echo ============================================
-echo   ✅ All builds complete!
-echo   Version: %APP_VERSION%
+echo   All builds complete!
 echo   Output: %DIST_DIR%
+dir "%DIST_DIR%" /s /b
 echo ============================================
 echo.
-dir /B /S "%DIST_DIR%\*.apk" 2>nul || echo (no APK found - check build output)
-echo.
 
-REM Copy to Releases folder with clean names
-set "RELEASE_DIR=%SCRIPT_DIR%Releases\%APP_VERSION%\android"
+REM ----- Copy to Releases folder -----
+set "RELEASE_DIR=%SCRIPT_DIR%Releases\android"
 if not exist "%RELEASE_DIR%" mkdir "%RELEASE_DIR%"
 
-copy /Y "%DIST_DIR%\arm64-v8a\com.CreeperMPG.PhiShell.Studio-Signed.apk" "%RELEASE_DIR%\PhiShellStudio-arm64-v8a.apk" >nul
-copy /Y "%DIST_DIR%\armeabi-v7a\com.CreeperMPG.PhiShell.Studio-Signed.apk" "%RELEASE_DIR%\PhiShellStudio-armeabi-v7a.apk" >nul
-copy /Y "%DIST_DIR%\x86_64\com.CreeperMPG.PhiShell.Studio-Signed.apk" "%RELEASE_DIR%\PhiShellStudio-x86_64.apk" >nul
+echo Copying APKs to: %RELEASE_DIR%
+for %%R in (%ARCH_LIST%) do (
+    set "APK_FILE=%DIST_DIR%\%%R\com.CreeperMPG.PhiShell.Studio-Signed.apk"
+    if exist "!APK_FILE!" (
+        copy /Y "!APK_FILE!" "%RELEASE_DIR%\PhiShellStudio-%%R.apk" >nul
+        echo   [OK] PhiShellStudio-%%R.apk
+    ) else (
+        echo   [--] PhiShellStudio-%%R.apk (not found)
+    )
+)
 
-echo   Also copied to: %RELEASE_DIR%
-dir "%RELEASE_DIR%"
 echo.
-
+dir "%RELEASE_DIR%" /b
+echo.
 pause
